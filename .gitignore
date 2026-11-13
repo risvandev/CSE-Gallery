@@ -1,15 +1,41 @@
-# Environment Variables
+# Environment & Secrets (Never push to GitHub)
 .env
 .env.local
 .env.*.local
+*.env
+!.env.example
 
-# Node modules & logs
+# Database & Schema Files
+*.sql
+*.sqlite
+*.dump
+
+# Dependencies
 node_modules/
+
+# Logs
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# OS Files
+# OS Generated Files
 .DS_Store
 Thumbs.db
+ehthumbs.db
+[Dd]esktop.ini
 
+# IDE & Editor Settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary & Cache Files
+tmp/
+temp/
+.temp/
+.cache/
