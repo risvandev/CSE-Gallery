@@ -85,9 +85,20 @@ create policy "Students can delete own photos"
     for delete
     using (
         bucket_id = 'class-moments'
-        and (auth.uid()::text = (storage.foldername(name))[1] or auth.uid() = owner)
+        and (auth.uid()::text = (storage.foldername(name))[1])
     );
 
 -- 4. Enable Realtime on the moments table so new uploads appear live
-alter publication supabase_realtime add table public.moments;
+-- (Idempotent: safely checks if already added so it never throws an error on re-run)
+do $$
+begin
+    if not exists (
+        select 1 from pg_publication_tables 
+        where pubname = 'supabase_realtime' 
+        and schemaname = 'public' 
+        and tablename = 'moments'
+    ) then
+        alter publication supabase_realtime add table public.moments;
+    end if;
+end $$;
 

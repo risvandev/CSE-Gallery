@@ -9,11 +9,12 @@
 1. Go to [https://supabase.com](https://supabase.com) and create an account or sign in.
 2. Click **"New Project"**, name it (e.g. `cseb-class-gallery`), set a secure database password, and choose a region close to your users (e.g. `Mumbai (ap-south-1)`).
 3. Once the project finishes initializing (1-2 minutes):
-   - Go to **Project Settings** (gear icon at bottom left) -> **API**.
+   - Go to **Project Settings** (gear icon at bottom left) -> **API** (or **API Keys**).
    - Note down:
      - **Project URL** (e.g. `https://your-project-id.supabase.co`)
-     - **anon / public key** (the long `eyJ...` token)
-     - **Project Reference ID** (found in the URL: `https://supabase.com/dashboard/project/<PROJECT_REF>`)
+     - **Publishable Key** (starts with `sb_pub_...` or modern client key — recommended by Supabase to avoid legacy key retirement)
+     - *(Legacy fallback)* If your project displays `anon / public`, that key will also work seamlessly.
+     - **Project Reference ID** (found in your URL: `https://supabase.com/dashboard/project/<PROJECT_REF>`)
 
 ---
 
@@ -80,12 +81,17 @@ Open [`.env`](file:///d:/My%20Creations/CSE-B%20Gallery/.env) in your project an
 
 ```env
 SUPABASE_URL=https://<YOUR_PROJECT_REF>.supabase.co
-SUPABASE_ANON_KEY=<YOUR_SUPABASE_ANON_KEY>
+
+# Modern Publishable API Key (recommended by Supabase; replaces retiring legacy anon key)
+SUPABASE_PUBLISHABLE_KEY=<YOUR_SUPABASE_PUBLISHABLE_KEY>
+
 SUPABASE_STORAGE_BUCKET=class-moments
 PRODUCTION_DOMAIN=https://gallery.mndo.online
 PORT=5500
 ```
 
+> **Note on Supabase Key Migration:** Supabase is retiring legacy JWT `anon` keys in early 2027 in favor of modern **Publishable API Keys** (`sb_pub_...`). Our backend and frontend natively support `SUPABASE_PUBLISHABLE_KEY` (and also accept legacy `SUPABASE_ANON_KEY` as fallback), ensuring uninterrupted operation.
+> 
 > **Security Note:** `.env` is automatically ignored in [`.gitignore`](file:///d:/My%20Creations/CSE-B%20Gallery/.gitignore) so your secrets will never be committed to Git or exposed in the repository.
 
 ---
