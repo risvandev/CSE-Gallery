@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Moments | gallery.mndo.online</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -209,9 +210,9 @@
         <div class="hero-content p-6 md:p-10">
 
             <!-- Logo -->
-            <div class="absolute top-6 left-6 md:top-[40px] md:left-[40px] flex items-center">
-                <div class="w-4 h-4 rounded-full bg-[#1a1a1a] z-0"></div>
-                <div class="w-4 h-4 rounded-full bg-[#c6e070] -ml-[6px] z-10"></div>
+            <div class="absolute top-6 left-6 md:top-[40px] md:left-[40px] flex items-center z-30">
+                <img src="assets/logo_without_back.png" alt="Class Moments Logo"
+                    class="w-8 h-8 md:w-10 md:h-10 object-contain select-none">
             </div>
 
             <!-- Auth Profile / Google Sign-In (Top Right) -->
@@ -281,7 +282,6 @@
                 <div id="statsRow"
                     class="mt-8 pt-5 border-t border-[#deddd7]/80 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#7a7a7a]">
                     <div class="flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-[#1a1a1a]"></span>
                         <span>Total moments: <strong id="totalCount"
                                 class="text-[#1a1a1a] font-medium">0</strong></span>
                     </div>
@@ -652,8 +652,7 @@
                     </svg>
                 </div>
                 <h3 class="text-lg font-medium text-[#1a1a1a] mb-1">No moments uploaded yet</h3>
-                <p class="text-xs text-[#7a7a7a] max-w-xs mb-5">Upload your first class moment to see it in the
-                    gallery.</p>
+                <p class="text-xs text-[#7a7a7a] max-w-xs mb-5">Upload your first class moment.</p>
                 <button id="emptyUploadBtn"
                     class="bg-[#1a1a1a] text-white hover:bg-black transition-colors px-5 py-2 rounded-lg text-sm font-medium cursor-pointer">
                     Upload Photo
