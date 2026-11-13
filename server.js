@@ -52,9 +52,13 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // 2. Static File Serving
+    // 2. Static File Serving (Clean URLs support)
     if (pathname === '/' || pathname === '') {
         pathname = '/index.html';
+    } else if (!path.extname(pathname)) {
+        if (fs.existsSync(path.join(__dirname, pathname + '.html'))) {
+            pathname += '.html';
+        }
     }
 
     const filePath = path.join(__dirname, pathname);
