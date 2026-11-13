@@ -1,0 +1,15 @@
+{
+  "name": "cseb-gallery",
+  "version": "1.0.0",
+  "description": "Production Class Moments Gallery with Supabase & Google Auth",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": ["gallery", "supabase", "google-auth", "class-moments"],
+  "author": "",
+  "license": "ISC"
+}
+

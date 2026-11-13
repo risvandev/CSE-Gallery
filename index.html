@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Moments | gallery.mndo.online</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f2f1eb;
+        }
+
+        /* Custom scrollbar to match the neat aesthetic if it ever scrolls */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #deddd7;
+            border-radius: 4px;
+        }
+
+        .col-track {
+            will-change: transform;
+        }
+
+        @keyframes diagonal-shift {
+            0% {
+                transform: translate3d(50px, -50px, 0);
+            }
+
+            100% {
+                transform: translate3d(-50px, 50px, 0);
+            }
+        }
+
+        .mobile-diagonal {
+            animation: diagonal-shift 18s ease-in-out infinite alternate;
+            will-change: transform;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        @media (min-width: 768px) {
+            .mobile-diagonal {
+                animation: none;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        .gallery-container {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            pointer-events: none;
+            width: 100%;
+            transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        @media (min-width: 1024px) {
+            .gallery-container {
+                width: 55%;
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .gallery-container {
+                width: 50%;
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1), padding 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        @media (min-width: 1024px) {
+            .hero-content {
+                width: 45%;
+                justify-content: flex-start;
+                padding-left: 8%;
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .hero-content {
+                width: 50%;
+                padding-left: 10%;
+            }
+        }
+
+        :root {
+            --card-w: 135px;
+        }
+
+        @media (min-width: 768px) {
+            :root {
+                --card-w: 210px;
+            }
+        }
+
+        .column-col {
+            width: var(--card-w);
+            flex-shrink: 0;
+            transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1), margin-top 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .card-slot {
+            overflow: hidden;
+            position: relative;
+            width: var(--card-w) !important;
+            flex-shrink: 0;
+            transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1), height 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* Proportional card heights on mobile (< 768px) */
+        .card-slot.h-\[220px\] {
+            height: 140px !important;
+        }
+
+        .card-slot.h-\[240px\] {
+            height: 155px !important;
+        }
+
+        .card-slot.h-\[260px\] {
+            height: 165px !important;
+        }
+
+        .card-slot.h-\[280px\] {
+            height: 180px !important;
+        }
+
+        @media (min-width: 768px) {
+            .card-slot.h-\[220px\] {
+                height: 220px !important;
+            }
+
+            .card-slot.h-\[240px\] {
+                height: 240px !important;
+            }
+
+            .card-slot.h-\[260px\] {
+                height: 260px !important;
+            }
+
+            .card-slot.h-\[280px\] {
+                height: 280px !important;
+            }
+        }
+
+        .col-track .set-1,
+        .col-track .set-2 {
+            gap: 12px !important;
+            padding-bottom: 12px !important;
+        }
+
+        @media (min-width: 768px) {
+
+            .col-track .set-1,
+            .col-track .set-2 {
+                gap: 24px !important;
+                padding-bottom: 24px !important;
+            }
+        }
+
+        .card-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.1;
+            display: block;
+            flex-shrink: 0;
+            transition: opacity 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        @media (min-width: 768px) {
+            .card-slot img {
+                opacity: 0.35;
+            }
+        }
+    </style>
+</head>
+
+<body class="m-0 p-0 h-screen overflow-hidden flex flex-col text-[#1a1a1a]">
+
+    <!-- Main Content Area -->
+    <main class="relative h-[calc(100vh-56px)] md:h-[calc(100vh-65px)] w-full overflow-hidden flex">
+
+        <!-- Left Side: Content & Logo -->
+        <div class="hero-content p-6 md:p-10">
+
+            <!-- Logo -->
+            <div class="absolute top-6 left-6 md:top-[40px] md:left-[40px] flex items-center">
+                <div class="w-4 h-4 rounded-full bg-[#1a1a1a] z-0"></div>
+                <div class="w-4 h-4 rounded-full bg-[#c6e070] -ml-[6px] z-10"></div>
+            </div>
+
+            <!-- Auth Profile / Google Sign-In (Top Right) -->
+            <div class="absolute top-6 right-6 md:top-[40px] md:right-[40px] z-30 flex items-center gap-2">
+                <button id="googleSignInBtn"
+                    class="flex items-center gap-2 px-3 py-1.5 md:px-3.5 md:py-2 rounded-lg bg-white/90 hover:bg-white border border-[#deddd7] hover:border-[#1a1a1a] text-xs md:text-sm font-medium text-[#1a1a1a] shadow-sm transition-all backdrop-blur cursor-pointer">
+                    <svg class="w-3.5 h-3.5 md:w-4 md:h-4 shrink-0" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                    <span>Sign in</span>
+                </button>
+
+                <div id="userProfile"
+                    class="hidden flex items-center gap-2 pl-1.5 pr-2.5 py-1 md:pl-2 md:pr-3 md:py-1.5 rounded-lg bg-white/90 border border-[#deddd7] text-xs md:text-sm font-medium text-[#1a1a1a] shadow-sm backdrop-blur">
+                    <img id="userAvatar" src="" alt="Avatar" class="w-5 h-5 md:w-6 md:h-6 rounded-full object-cover border border-[#deddd7]">
+                    <span id="userName" class="max-w-[90px] md:max-w-[130px] truncate">Student</span>
+                    <button id="signOutBtn" class="text-[#7a7a7a] hover:text-red-500 transition-colors ml-1 p-0.5 cursor-pointer" title="Sign out">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Center Content -->
+            <div class="max-w-[320px] md:max-w-[420px] lg:max-w-[320px] w-full">
+                <h1 class="text-[26px] md:text-[32px] lg:text-[26px] font-medium leading-snug mb-6 text-[#1a1a1a]">
+                    All our class moments, in one place.
+                </h1>
+
+                <div class="flex items-center gap-3">
+                    <button id="uploadBtn"
+                        class="bg-[#1a1a1a] text-white hover:bg-black transition-colors px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 font-medium cursor-pointer">
+                        Upload
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7 17L17 7"></path>
+                            <path d="M7 7h10v10"></path>
+                        </svg>
+                    </button>
+
+                    <button id="viewBtn"
+                        class="bg-transparent text-[#1a1a1a] border border-[#1a1a1a] hover:bg-gray-100 transition-colors px-5 py-2.5 rounded-lg text-sm flex items-center gap-2 font-medium cursor-pointer">
+                        View
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7 7l10 10"></path>
+                            <path d="M17 7v10H7"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Dynamic Class Stats Row -->
+                <div id="statsRow" class="mt-8 pt-5 border-t border-[#deddd7]/80 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#7a7a7a]">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-[#1a1a1a]"></span>
+                        <span>Total moments: <strong id="totalCount" class="text-[#1a1a1a] font-medium">0</strong></span>
+                    </div>
+                    <div id="userStats" class="flex items-center gap-1.5 hidden">
+                        <span class="w-2 h-2 rounded-full bg-[#c6e070]"></span>
+                        <span>Your uploads: <strong id="userCount" class="text-[#1a1a1a] font-medium">0</strong></span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Side: Masonry Gallery (Smooth Responsive Background / Split) -->
+        <div class="gallery-container">
+            <div class="flex justify-center gap-3 md:gap-6 mobile-diagonal shrink-0">
+
+                <!-- Column 1 -->
+                <div class="column-col mt-[-100px] lg:mt-[-80px]">
+                    <div id="colTrack1" class="col-track flex flex-col">
+                        <!-- Set 1 -->
+                        <div class="set-1 flex flex-col gap-6 pb-6">
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                            </div>
+                        </div>
+                        <!-- Set 2 (Duplicate for seamless loop) -->
+                        <div class="set-2 flex flex-col gap-6 pb-6">
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 2 -->
+                <div class="column-col mt-[-60px] lg:mt-[40px]">
+                    <div id="colTrack2" class="col-track flex flex-col">
+                        <!-- Set 1 -->
+                        <div class="set-1 flex flex-col gap-6 pb-6">
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[260px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[260px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                            </div>
+                        </div>
+                        <!-- Set 2 -->
+                        <div class="set-2 flex flex-col gap-6 pb-6">
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[260px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[260px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Column 3 -->
+                <div class="column-col mt-[-80px] lg:mt-[-40px]">
+                    <div id="colTrack3" class="col-track flex flex-col">
+                        <!-- Set 1 -->
+                        <div class="set-1 flex flex-col gap-6 pb-6">
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                            </div>
+                        </div>
+                        <!-- Set 2 -->
+                        <div class="set-2 flex flex-col gap-6 pb-6">
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                            </div>
+                            <div
+                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer
+        class="h-[56px] md:h-[65px] bg-[#3c3c3b] flex items-center justify-end px-4 md:px-10 gap-2.5 md:gap-4 shrink-0 w-full relative z-10">
+        <button
+            class="contact-btn bg-transparent text-white border border-[#7a7a7a] px-3.5 py-1.5 md:px-6 md:py-2 rounded-md text-xs md:text-[13px] font-medium hover:bg-[#555] transition-colors cursor-pointer tracking-wide">
+            Contact
+        </button>
+        <button
+            class="report-btn bg-transparent text-white border border-[#7a7a7a] px-3.5 py-1.5 md:px-6 md:py-2 rounded-md text-xs md:text-[13px] font-medium hover:bg-[#555] transition-colors cursor-pointer tracking-wide">
+            Report
+        </button>
+    </footer>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div
+            class="bg-[#f2f1eb] border border-[#deddd7] rounded-2xl p-6 md:p-8 max-w-md w-full shadow-xl relative text-[#1a1a1a]">
+            <!-- Close Button -->
+            <button id="closeUploadModal"
+                class="absolute top-4 right-4 text-[#7a7a7a] hover:text-[#1a1a1a] p-1.5 rounded-lg transition-colors cursor-pointer"
+                aria-label="Close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+
+            <h2 class="text-xl font-medium mb-1">Upload Image</h2>
+            <p class="text-xs text-[#7a7a7a] mb-5">Only image files are allowed (PNG, JPG, WebP, GIF)</p>
+
+            <!-- Drop / File Selection Zone -->
+            <div id="dropZone"
+                class="border-2 border-dashed border-[#deddd7] hover:border-[#1a1a1a] rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-colors bg-white/40">
+                <input type="file" id="imageInput" accept="image/*" class="hidden">
+
+                <div id="uploadPrompt" class="flex flex-col items-center">
+                    <div class="w-12 h-12 rounded-full bg-[#deddd7]/60 flex items-center justify-center mb-3">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <!-- Desktop instruction -->
+                    <p class="hidden md:block text-sm font-medium text-[#1a1a1a]">
+                        Drag and drop your image here, or <span class="underline">browse</span>
+                    </p>
+                    <!-- Mobile instruction -->
+                    <p class="block md:hidden text-sm font-medium text-[#1a1a1a]">
+                        Tap to choose an image
+                    </p>
+                    <span class="text-[11px] text-[#7a7a7a] mt-1.5">Images only</span>
+                </div>
+
+                <!-- Preview State -->
+                <div id="filePreview" class="hidden flex flex-col items-center w-full">
+                    <img id="previewImg" src="" alt="Selected image preview"
+                        class="max-h-40 rounded-lg object-contain mb-3 border border-[#deddd7]">
+                    <p id="fileName" class="text-xs font-medium text-[#1a1a1a] truncate max-w-full mb-2"></p>
+                    <input id="momentCaption" type="text" maxlength="80" placeholder="Add a memory title or note (optional)"
+                        class="w-full bg-white border border-[#deddd7] focus:border-[#1a1a1a] rounded-lg px-3 py-2 text-xs text-[#1a1a1a] outline-none mb-2.5 transition-colors placeholder:text-[#a0a09e]">
+                    <div id="uploaderBadge" class="w-full flex items-center justify-between text-[11px] text-[#7a7a7a] mb-3 px-0.5">
+                        <span>Uploading as: <strong id="uploaderName" class="text-[#1a1a1a]">Classmate</strong></span>
+                    </div>
+                    <button id="doneBtn"
+                        class="bg-[#1a1a1a] text-white hover:bg-black transition-colors px-5 py-2.5 rounded-lg text-sm font-medium w-full flex items-center justify-center gap-2 cursor-pointer">
+                        <span id="doneBtnText">Upload Moment</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error message -->
+            <p id="uploadError" class="text-xs text-red-500 mt-2 hidden text-center"></p>
+        </div>
+    </div>
+
+    <!-- WhatsApp Confirmation Modal -->
+    <div id="whatsappModal"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div
+            class="bg-[#f2f1eb] border border-[#deddd7] rounded-2xl p-6 max-w-sm w-full shadow-xl relative text-[#1a1a1a]">
+            <!-- Cross in the top right -->
+            <button id="closeWhatsappModal"
+                class="absolute top-4 right-4 text-[#7a7a7a] hover:text-[#1a1a1a] p-1.5 rounded-lg transition-colors cursor-pointer"
+                aria-label="Close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+
+            <!-- Message on the template -->
+            <p class="text-sm text-[#1a1a1a] leading-relaxed mb-6 pr-6 font-medium">
+                You will be redirected to WhatsApp, don't change the template, only just add your message to the
+                template.
+            </p>
+
+            <!-- Report or Contact Button -->
+            <button id="confirmWhatsappBtn"
+                class="bg-[#1a1a1a] text-white hover:bg-black transition-colors px-5 py-2.5 rounded-lg text-sm font-medium w-full flex items-center justify-center gap-2 cursor-pointer">
+                <span id="confirmWhatsappText">Contact</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 17L17 7"></path>
+                    <path d="M7 7h10v10"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Auth Required Modal -->
+    <div id="authPromptModal"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div
+            class="bg-[#f2f1eb] border border-[#deddd7] rounded-2xl p-6 md:p-8 max-w-sm w-full shadow-xl relative text-[#1a1a1a]">
+            <button id="closeAuthPromptModal"
+                class="absolute top-4 right-4 text-[#7a7a7a] hover:text-[#1a1a1a] p-1.5 rounded-lg transition-colors cursor-pointer"
+                aria-label="Close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center mb-4 shadow-sm border border-[#deddd7]">
+                <svg class="w-6 h-6" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                </svg>
+            </div>
+            <h3 class="text-lg font-medium mb-1.5">Sign in to Upload</h3>
+            <p class="text-xs text-[#7a7a7a] leading-relaxed mb-6">
+                To keep our class gallery authentic and celebrate every classmate, please sign in with your Google account.
+            </p>
+            <button id="modalGoogleSignInBtn"
+                class="w-full bg-[#1a1a1a] text-white hover:bg-black transition-colors px-4 py-2.5 rounded-lg text-sm font-medium flex items-center justify-center gap-2.5 cursor-pointer">
+                <span>Continue with Google</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Gallery Page -->
+    <section id="galleryView" class="fixed inset-0 z-40 bg-[#f2f1eb] flex flex-col hidden text-[#1a1a1a]">
+        <!-- Top Navigation Bar -->
+        <header
+            class="h-[60px] md:h-[70px] border-b border-[#deddd7] px-4 md:px-10 flex items-center justify-between shrink-0 bg-[#f2f1eb]/90 backdrop-blur z-20">
+            <button id="backBtn"
+                class="flex items-center gap-1.5 md:gap-2 px-3 py-1.5 md:px-3.5 md:py-1.5 rounded-lg border border-[#deddd7] hover:border-[#1a1a1a] transition-colors text-xs md:text-sm font-medium cursor-pointer shrink-0">
+                <svg width="14" height="14" class="md:w-[15px] md:h-[15px]" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Back
+            </button>
+            <div class="flex items-center gap-2">
+                <h1
+                    class="text-xs sm:text-sm md:text-base lg:text-lg font-medium text-[#1a1a1a] whitespace-nowrap text-center px-1 truncate">
+                    Class Moments</h1>
+                <span id="galleryCountBadge" class="text-[11px] font-medium px-2 py-0.5 rounded-full bg-[#deddd7] text-[#1a1a1a]">0</span>
+            </div>
+            <button id="galleryUploadBtn"
+                class="bg-[#1a1a1a] text-white hover:bg-black transition-colors px-3 py-1.5 md:px-4 md:py-1.5 rounded-lg text-xs md:text-sm flex items-center gap-1 md:gap-1.5 font-medium cursor-pointer shrink-0">
+                Upload
+                <svg width="12" height="12" class="md:w-[13px] md:h-[13px]" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 17L17 7"></path>
+                    <path d="M7 7h10v10"></path>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Gallery Grid (Scrollable Content Area) -->
+        <div class="flex-1 overflow-y-auto w-full bg-[#f2f1eb]">
+            <div id="galleryGrid"
+                class="columns-2 sm:columns-3 md:columns-4 lg:columns-5 xl:columns-6 gap-0 p-0 w-full">
+                <!-- Populated dynamically -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyGallery" class="hidden flex flex-col items-center justify-center py-20 text-center px-4">
+                <div
+                    class="w-16 h-16 rounded-full bg-[#deddd7]/50 flex items-center justify-center mb-4 text-[#7a7a7a]">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21 15 16 10 5 21"></polyline>
+                    </svg>
+                </div>
+                <h3 class="text-lg font-medium text-[#1a1a1a] mb-1">No moments uploaded yet</h3>
+                <p class="text-xs text-[#7a7a7a] max-w-xs mb-5">Upload your first class moment to see it in the
+                    gallery.</p>
+                <button id="emptyUploadBtn"
+                    class="bg-[#1a1a1a] text-white hover:bg-black transition-colors px-5 py-2 rounded-lg text-sm font-medium cursor-pointer">
+                    Upload Photo
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer (Fixed in the bottom) -->
+            <footer
+                class="h-[56px] md:h-[65px] bg-[#3c3c3b] flex items-center justify-end px-4 md:px-10 gap-2.5 md:gap-4 shrink-0 w-full z-20">
+                <button
+                    class="contact-btn bg-transparent text-white border border-[#7a7a7a] px-3.5 py-1.5 md:px-6 md:py-2 rounded-md text-xs md:text-[13px] font-medium hover:bg-[#555] transition-colors cursor-pointer tracking-wide">
+                    Contact
+                </button>
+                <button
+                    class="report-btn bg-transparent text-white border border-[#7a7a7a] px-3.5 py-1.5 md:px-6 md:py-2 rounded-md text-xs md:text-[13px] font-medium hover:bg-[#555] transition-colors cursor-pointer tracking-wide">
+                    Report
+                </button>
+            </footer>
+    </section>
+
+    <script>
+        // --- Environment Configuration & Supabase Initialization ---
+        let appConfig = null;
+        let supabaseClient = null;
+        let currentUser = null;
+        let cachedMoments = [];
+
+        async function fetchAppConfig() {
+            try {
+                const res = await fetch('/api/config');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.url && !data.url.includes('YOUR_PROJECT_REF')) {
+                        return data;
+                    }
+                }
+            } catch (err) {
+                // Non-blocking fallback
+            }
+            return null;
+        }
+
+        function isSupabaseReady() {
+            return Boolean(supabaseClient);
+        }
+
+        // --- Element References ---
+        const uploadBtn = document.getElementById('uploadBtn');
+        const viewBtn = document.getElementById('viewBtn');
+        const uploadModal = document.getElementById('uploadModal');
+        const closeUploadModal = document.getElementById('closeUploadModal');
+        const dropZone = document.getElementById('dropZone');
+        const imageInput = document.getElementById('imageInput');
+        const uploadPrompt = document.getElementById('uploadPrompt');
+        const filePreview = document.getElementById('filePreview');
+        const previewImg = document.getElementById('previewImg');
+        const fileName = document.getElementById('fileName');
+        const momentCaption = document.getElementById('momentCaption');
+        const uploaderBadge = document.getElementById('uploaderBadge');
+        const uploaderName = document.getElementById('uploaderName');
+        const doneBtn = document.getElementById('doneBtn');
+        const doneBtnText = document.getElementById('doneBtnText');
+        const uploadError = document.getElementById('uploadError');
+
+        const galleryView = document.getElementById('galleryView');
+        const backBtn = document.getElementById('backBtn');
+        const galleryGrid = document.getElementById('galleryGrid');
+        const emptyGallery = document.getElementById('emptyGallery');
+        const galleryUploadBtn = document.getElementById('galleryUploadBtn');
+        const emptyUploadBtn = document.getElementById('emptyUploadBtn');
+        const galleryCountBadge = document.getElementById('galleryCountBadge');
+
+        const googleSignInBtn = document.getElementById('googleSignInBtn');
+        const userProfile = document.getElementById('userProfile');
+        const userAvatar = document.getElementById('userAvatar');
+        const userName = document.getElementById('userName');
+        const signOutBtn = document.getElementById('signOutBtn');
+
+        const statsRow = document.getElementById('statsRow');
+        const totalCount = document.getElementById('totalCount');
+        const userStats = document.getElementById('userStats');
+        const userCount = document.getElementById('userCount');
+
+        const authPromptModal = document.getElementById('authPromptModal');
+        const closeAuthPromptModal = document.getElementById('closeAuthPromptModal');
+        const modalGoogleSignInBtn = document.getElementById('modalGoogleSignInBtn');
+
+        const whatsappModal = document.getElementById('whatsappModal');
+        const closeWhatsappModal = document.getElementById('closeWhatsappModal');
+        const confirmWhatsappBtn = document.getElementById('confirmWhatsappBtn');
+        const confirmWhatsappText = document.getElementById('confirmWhatsappText');
+
+        let currentWhatsappType = 'Contact';
+        const WHATSAPP_PHONE = '918848460715';
+        let currentImageDataUrl = null;
+        let currentImageBlob = null;
+
+        // --- Fallback Local Storage ---
+        function getStoredImages() {
+            try { return JSON.parse(localStorage.getItem('cseb_gallery_images') || '[]'); }
+            catch (e) { return []; }
+        }
+
+        function saveLocalImage(dataUrl, name) {
+            const images = getStoredImages();
+            images.unshift({
+                id: Date.now(),
+                url: dataUrl,
+                name: name || 'Class Moment',
+                userName: currentUser ? (currentUser.user_metadata?.full_name || 'You') : 'Classmate',
+                userId: currentUser ? currentUser.id : null,
+                createdAt: new Date().toISOString()
+            });
+            try { localStorage.setItem('cseb_gallery_images', JSON.stringify(images)); }
+            catch (e) { console.warn('Storage limit reached', e); }
+        }
+
+        // --- Auth UI Management ---
+        function updateAuthUI() {
+            if (currentUser) {
+                if (googleSignInBtn) googleSignInBtn.classList.add('hidden');
+                if (userProfile) userProfile.classList.remove('hidden');
+
+                const name = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'Student';
+                const avatar = currentUser.user_metadata?.avatar_url || 'https://www.gravatar.com/avatar/?d=mp';
+
+                if (userName) userName.textContent = name;
+                if (userAvatar) userAvatar.src = avatar;
+                if (uploaderName) uploaderName.textContent = name;
+            } else {
+                if (googleSignInBtn) googleSignInBtn.classList.remove('hidden');
+                if (userProfile) userProfile.classList.add('hidden');
+                if (uploaderName) uploaderName.textContent = 'Classmate';
+            }
+            updateStats();
+        }
+
+        // --- Google Sign-in Handler ---
+        async function signInWithGoogle() {
+            if (!isSupabaseReady()) {
+                alert("Supabase is not connected yet. Please configure your .env file and restart the server.");
+                return;
+            }
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const redirectUrl = isLocal
+                ? window.location.origin
+                : (appConfig?.productionDomain || 'https://gallery.mndo.online');
+
+            const { error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: redirectUrl
+                }
+            });
+            if (error) {
+                console.error('Google Sign-in error:', error);
+                alert('Sign in failed: ' + error.message);
+            }
+        }
+
+        async function signOut() {
+            if (supabaseClient) {
+                await supabaseClient.auth.signOut();
+            }
+            currentUser = null;
+            updateAuthUI();
+            await reloadMoments();
+        }
+
+        // --- Moments Data Layer ---
+        async function fetchMoments() {
+            if (isSupabaseReady()) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('moments')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    if (error) throw error;
+                    return data.map(m => ({
+                        id: m.id,
+                        url: m.image_url,
+                        name: m.title || 'Class Moment',
+                        userName: m.user_name || 'Classmate',
+                        userId: m.user_id,
+                        createdAt: m.created_at
+                    }));
+                } catch (err) {
+                    console.warn('Could not fetch moments from Supabase, using local fallback:', err);
+                }
+            }
+            return getStoredImages();
+        }
+
+        async function reloadMoments() {
+            cachedMoments = await fetchMoments();
+            updateStats();
+            updateMasonryCards();
+            renderGallery();
+        }
+
+        function updateStats() {
+            const total = cachedMoments.length;
+            if (totalCount) totalCount.textContent = total;
+            if (galleryCountBadge) galleryCountBadge.textContent = total;
+
+            if (currentUser) {
+                const userUploads = cachedMoments.filter(m => m.userId === currentUser.id).length;
+                if (userCount) userCount.textContent = userUploads;
+                if (userStats) userStats.classList.remove('hidden');
+            } else {
+                if (userStats) userStats.classList.add('hidden');
+            }
+        }
+
+        // --- Masonry Card Filler ---
+        function updateMasonryCards() {
+            if (!cachedMoments || cachedMoments.length === 0) return;
+
+            const tracks = [
+                document.getElementById('colTrack1'),
+                document.getElementById('colTrack2'),
+                document.getElementById('colTrack3')
+            ];
+
+            tracks.forEach((track, colIdx) => {
+                if (!track) return;
+                const set1Slots = track.querySelectorAll('.set-1 .card-slot');
+                const set2Slots = track.querySelectorAll('.set-2 .card-slot');
+
+                set1Slots.forEach((slot, cardIdx) => {
+                    const img = cachedMoments[(colIdx * 2 + cardIdx) % cachedMoments.length];
+                    const content = `<img src="${img.url}" alt="${img.name}" class="w-full h-full object-cover opacity-20 md:opacity-35">`;
+                    slot.innerHTML = content;
+                    if (set2Slots[cardIdx]) {
+                        set2Slots[cardIdx].innerHTML = content;
+                    }
+                });
+            });
+        }
+
+        // --- Gallery Rendering ---
+        function renderGallery() {
+            galleryGrid.innerHTML = '';
+            if (cachedMoments.length === 0) {
+                emptyGallery.classList.remove('hidden');
+                galleryGrid.classList.add('hidden');
+                return;
+            }
+            emptyGallery.classList.add('hidden');
+            galleryGrid.classList.remove('hidden');
+
+            cachedMoments.forEach((img) => {
+                const card = document.createElement('div');
+                card.className = 'break-inside-avoid mb-0 relative group overflow-hidden border-[0.5px] border-[#1a1a1a]';
+                card.style.border = '0.5px solid #1a1a1a';
+
+                const imageEl = document.createElement('img');
+                imageEl.src = img.url;
+                imageEl.alt = img.name;
+                imageEl.loading = 'lazy';
+                imageEl.className = 'w-full h-auto block transition-transform duration-300 group-hover:scale-[1.02]';
+
+                const overlay = document.createElement('div');
+                overlay.className = 'absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2.5 sm:p-3';
+
+                const title = document.createElement('p');
+                title.className = 'text-white text-xs font-medium truncate drop-shadow';
+                title.textContent = img.name;
+
+                if (img.userName) {
+                    const author = document.createElement('p');
+                    author.className = 'text-[#deddd7] text-[10px] truncate mt-0.5';
+                    author.textContent = `by ${img.userName}`;
+                    overlay.appendChild(author);
+                }
+
+                overlay.prepend(title);
+                card.appendChild(imageEl);
+                card.appendChild(overlay);
+                galleryGrid.appendChild(card);
+            });
+        }
+
+        function showGallery() {
+            renderGallery();
+            galleryView.classList.remove('hidden');
+        }
+
+        function hideGallery() {
+            galleryView.classList.add('hidden');
+        }
+
+        // --- Upload Flow & Auth Gate ---
+        function checkAuthBeforeUpload() {
+            if (!currentUser && isSupabaseReady()) {
+                authPromptModal.classList.remove('hidden');
+                return false;
+            }
+            return true;
+        }
+
+        function openModal() {
+            if (!checkAuthBeforeUpload()) return;
+            uploadModal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            uploadModal.classList.add('hidden');
+            resetUpload();
+        }
+
+        function resetUpload() {
+            imageInput.value = '';
+            currentImageDataUrl = null;
+            currentImageBlob = null;
+            if (momentCaption) momentCaption.value = '';
+            uploadPrompt.classList.remove('hidden');
+            filePreview.classList.add('hidden');
+            previewImg.src = '';
+            fileName.textContent = '';
+            uploadError.classList.add('hidden');
+            uploadError.textContent = '';
+            dropZone.classList.remove('border-[#1a1a1a]', 'bg-white/70');
+            doneBtn.disabled = false;
+            if (doneBtnText) doneBtnText.textContent = 'Upload Moment';
+        }
+
+        function handleFile(file) {
+            uploadError.classList.add('hidden');
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                uploadError.textContent = 'Only image files are allowed.';
+                uploadError.classList.remove('hidden');
+                resetUpload();
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let { width, height } = img;
+                    const maxDim = 1600;
+                    if (width > maxDim || height > maxDim) {
+                        if (width > height) { height = Math.round((height * maxDim) / width); width = maxDim; }
+                        else { width = Math.round((width * maxDim) / height); height = maxDim; }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                    currentImageDataUrl = canvas.toDataURL('image/jpeg', 0.88);
+                    previewImg.src = currentImageDataUrl;
+                    fileName.textContent = file.name;
+
+                    canvas.toBlob((blob) => {
+                        currentImageBlob = blob;
+                    }, 'image/jpeg', 0.88);
+
+                    uploadPrompt.classList.add('hidden');
+                    filePreview.classList.remove('hidden');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // --- Upload Submission to Supabase Storage & Database ---
+        async function submitUpload() {
+            if (!currentImageBlob && !currentImageDataUrl) return;
+
+            const caption = (momentCaption && momentCaption.value.trim()) || fileName.textContent || 'Class Moment';
+
+            doneBtn.disabled = true;
+            if (doneBtnText) doneBtnText.innerHTML = `
+                <span class="inline-flex items-center gap-1.5">
+                    <svg class="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    Uploading to cloud...
+                </span>
+            `;
+
+            try {
+                if (isSupabaseReady() && currentUser) {
+                    const bucket = appConfig?.storageBucket || 'class-moments';
+                    const fileExt = 'jpg';
+                    const cleanName = (fileName.textContent || 'moment').replace(/[^a-zA-Z0-9]/g, '_');
+                    const filePath = `${currentUser.id}/${Date.now()}_${cleanName}.${fileExt}`;
+
+                    // 1. Upload to Supabase Storage Bucket
+                    const { error: storageError } = await supabaseClient.storage
+                        .from(bucket)
+                        .upload(filePath, currentImageBlob, {
+                            contentType: 'image/jpeg',
+                            cacheControl: '3600',
+                            upsert: false
+                        });
+
+                    if (storageError) throw storageError;
+
+                    // 2. Get Public CDN URL
+                    const { data: { publicUrl } } = supabaseClient.storage
+                        .from(bucket)
+                        .getPublicUrl(filePath);
+
+                    // 3. Insert record into moments table
+                    const userNameStr = currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'Classmate';
+                    const userAvatarStr = currentUser.user_metadata?.avatar_url || '';
+
+                    const { error: dbError } = await supabaseClient
+                        .from('moments')
+                        .insert([{
+                            image_url: publicUrl,
+                            title: caption,
+                            user_id: currentUser.id,
+                            user_name: userNameStr,
+                            user_email: currentUser.email,
+                            user_avatar: userAvatarStr,
+                            file_path: filePath
+                        }]);
+
+                    if (dbError) throw dbError;
+                } else {
+                    // Fallback to local storage
+                    saveLocalImage(currentImageDataUrl, caption);
+                }
+
+                await reloadMoments();
+                closeModal();
+                showGallery();
+            } catch (err) {
+                console.error('Upload failed:', err);
+                uploadError.textContent = 'Upload failed: ' + (err.message || 'Please check your connection.');
+                uploadError.classList.remove('hidden');
+                doneBtn.disabled = false;
+                if (doneBtnText) doneBtnText.textContent = 'Upload Moment';
+            }
+        }
+
+        // --- WhatsApp Template & Modal ---
+        function getWhatsappTemplate(type) {
+            return `*Gallery.MNDO ${type}*:
+*Name:* ${currentUser ? (currentUser.user_metadata?.full_name || '') : ''}
+*Subject:* 
+*Message:* `;
+        }
+
+        function openWhatsappModal(type) {
+            currentWhatsappType = type;
+            confirmWhatsappText.textContent = type;
+            whatsappModal.classList.remove('hidden');
+        }
+
+        function closeWhatsappModalFn() {
+            whatsappModal.classList.add('hidden');
+        }
+
+        function proceedToWhatsapp() {
+            const template = getWhatsappTemplate(currentWhatsappType);
+            const url = `https://api.whatsapp.com/send?phone=${WHATSAPP_PHONE}&text=${encodeURIComponent(template)}`;
+            window.open(url, '_blank');
+            closeWhatsappModalFn();
+        }
+
+        // --- Realtime Sync Listener ---
+        function setupRealtimeListener() {
+            if (!isSupabaseReady()) return;
+            try {
+                supabaseClient
+                    .channel('public:moments')
+                    .on('postgres_changes', { event: '*', schema: 'public', table: 'moments' }, () => {
+                        reloadMoments();
+                    })
+                    .subscribe();
+            } catch (err) {
+                console.warn('Realtime channel subscription error:', err);
+            }
+        }
+
+        // --- Event Listeners ---
+        uploadBtn.addEventListener('click', openModal);
+        galleryUploadBtn.addEventListener('click', openModal);
+        emptyUploadBtn.addEventListener('click', openModal);
+        closeUploadModal.addEventListener('click', closeModal);
+        viewBtn.addEventListener('click', showGallery);
+        backBtn.addEventListener('click', hideGallery);
+
+        if (googleSignInBtn) googleSignInBtn.addEventListener('click', signInWithGoogle);
+        if (modalGoogleSignInBtn) modalGoogleSignInBtn.addEventListener('click', () => {
+            authPromptModal.classList.add('hidden');
+            signInWithGoogle();
+        });
+        if (signOutBtn) signOutBtn.addEventListener('click', signOut);
+
+        if (closeAuthPromptModal) closeAuthPromptModal.addEventListener('click', () => {
+            authPromptModal.classList.add('hidden');
+        });
+        if (authPromptModal) authPromptModal.addEventListener('click', (e) => {
+            if (e.target === authPromptModal) authPromptModal.classList.add('hidden');
+        });
+
+        document.querySelectorAll('.contact-btn').forEach(btn => {
+            btn.addEventListener('click', () => openWhatsappModal('Contact'));
+        });
+
+        document.querySelectorAll('.report-btn').forEach(btn => {
+            btn.addEventListener('click', () => openWhatsappModal('Report'));
+        });
+
+        closeWhatsappModal.addEventListener('click', closeWhatsappModalFn);
+        confirmWhatsappBtn.addEventListener('click', proceedToWhatsapp);
+
+        whatsappModal.addEventListener('click', (e) => {
+            if (e.target === whatsappModal) closeWhatsappModalFn();
+        });
+
+        doneBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            submitUpload();
+        });
+
+        uploadModal.addEventListener('click', (e) => {
+            if (e.target === uploadModal) closeModal();
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (!uploadModal.classList.contains('hidden')) closeModal();
+                else if (!whatsappModal.classList.contains('hidden')) closeWhatsappModalFn();
+                else if (authPromptModal && !authPromptModal.classList.contains('hidden')) authPromptModal.classList.add('hidden');
+                else if (!galleryView.classList.contains('hidden')) hideGallery();
+            }
+        });
+
+        dropZone.addEventListener('click', () => imageInput.click());
+
+        imageInput.addEventListener('change', (e) => {
+            handleFile(e.target.files && e.target.files[0]);
+        });
+
+        ['dragenter', 'dragover'].forEach(ev => {
+            dropZone.addEventListener(ev, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('border-[#1a1a1a]', 'bg-white/70');
+            });
+        });
+
+        ['dragleave', 'dragend'].forEach(ev => {
+            dropZone.addEventListener(ev, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('border-[#1a1a1a]', 'bg-white/70');
+            });
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('border-[#1a1a1a]', 'bg-white/70');
+            handleFile(e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]);
+        });
+
+        // --- Continuous Smooth Scroll Engine (Lag-Free & Zero-Jump) ---
+        const track1 = document.getElementById('colTrack1');
+        const track2 = document.getElementById('colTrack2');
+        const track3 = document.getElementById('colTrack3');
+
+        let pos1 = 0;
+        let pos2 = 0;
+        let pos3 = 0;
+        let lastTimestamp = performance.now();
+
+        const speed1 = 28; // Col 1: Up (px/s)
+        const speed2 = 25; // Col 2: Down (px/s)
+        const speed3 = 23; // Col 3: Up (px/s)
+
+        function getTrackHalfHeight(track) {
+            if (!track || !track.firstElementChild) return 1624;
+            return track.firstElementChild.offsetHeight || 1624;
+        }
+
+        function runScrollLoop(timestamp) {
+            let dt = (timestamp - lastTimestamp) / 1000;
+            lastTimestamp = timestamp;
+
+            if (dt > 0.05 || dt < 0) dt = 0.016;
+
+            const h1 = getTrackHalfHeight(track1);
+            const h2 = getTrackHalfHeight(track2);
+            const h3 = getTrackHalfHeight(track3);
+
+            // Column 1: Smooth Upward Scroll
+            pos1 = (pos1 + speed1 * dt) % h1;
+            track1.style.transform = `translate3d(0, -${pos1.toFixed(2)}px, 0)`;
+
+            // Column 2: Smooth Downward Scroll
+            pos2 = pos2 - speed2 * dt;
+            if (pos2 < 0) pos2 += h2;
+            track2.style.transform = `translate3d(0, -${pos2.toFixed(2)}px, 0)`;
+
+            // Column 3: Smooth Upward Scroll
+            pos3 = (pos3 + speed3 * dt) % h3;
+            track3.style.transform = `translate3d(0, -${pos3.toFixed(2)}px, 0)`;
+
+            requestAnimationFrame(runScrollLoop);
+        }
+
+        // Avoid tab-switch leap
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                lastTimestamp = performance.now();
+            }
+        });
+
+        // --- Initial Startup & Auth Hydration ---
+        async function initApp() {
+            // Load environment configuration dynamically from /api/config (.env)
+            appConfig = await fetchAppConfig();
+
+            if (appConfig && typeof window.supabase !== 'undefined') {
+                try {
+                    const clientKey = appConfig.publishableKey || appConfig.anonKey;
+                    supabaseClient = window.supabase.createClient(
+                        appConfig.url,
+                        clientKey
+                    );
+
+                    const { data: { session } } = await supabaseClient.auth.getSession();
+                    currentUser = session?.user || null;
+                    updateAuthUI();
+
+                    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                        currentUser = session?.user || null;
+                        updateAuthUI();
+                        await reloadMoments();
+                    });
+
+                    setupRealtimeListener();
+                } catch (err) {
+                    console.error('Session check error:', err);
+                }
+            } else {
+                console.info('Running in local demo mode. Configure your .env file to enable live database & Google Auth.');
+            }
+
+            await reloadMoments();
+            requestAnimationFrame(runScrollLoop);
+        }
+
+        initApp();
+    </script>
+
+</body>
+
+</html>
