@@ -3,9 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Class Moments | gallery.mndo.online</title>
     <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+    <link rel="preload" as="image" href="assets/logo_without_back.png" fetchpriority="high">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -13,6 +14,10 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f2f1eb;
+            min-height: 100vh;
+            min-height: 100dvh;
+            height: 100vh;
+            height: 100dvh;
         }
 
         /* Custom scrollbar to match the neat aesthetic if it ever scrolls */
@@ -201,10 +206,10 @@
     </style>
 </head>
 
-<body class="m-0 p-0 h-screen overflow-hidden flex flex-col text-[#1a1a1a]">
+<body class="m-0 p-0 h-[100dvh] overflow-hidden flex flex-col text-[#1a1a1a]">
 
     <!-- Main Content Area -->
-    <main class="relative h-[calc(100vh-56px)] md:h-[calc(100vh-65px)] w-full overflow-hidden flex">
+    <main class="relative flex-1 min-h-0 w-full overflow-hidden flex">
 
         <!-- Left Side: Content & Logo -->
         <div class="hero-content p-6 md:p-10">
@@ -212,7 +217,8 @@
             <!-- Logo -->
             <div class="absolute top-6 left-6 md:top-[40px] md:left-[40px] flex items-center z-30">
                 <img src="assets/logo_without_back.png" alt="Class Moments Logo"
-                    class="w-8 h-8 md:w-10 md:h-10 object-contain select-none">
+                    class="w-8 h-8 md:w-10 md:h-10 object-contain select-none"
+                    width="40" height="40" fetchpriority="high" loading="eager">
             </div>
 
             <!-- Auth Profile / Google Sign-In (Top Right) -->
@@ -449,7 +455,7 @@
 
     <!-- Footer -->
     <footer
-        class="h-[56px] md:h-[65px] bg-[#3c3c3b] flex items-center justify-between px-4 md:px-10 shrink-0 w-full relative z-10">
+        class="min-h-[56px] md:h-[65px] bg-[#3c3c3b] flex items-center justify-between px-4 md:px-10 shrink-0 w-full relative z-20 pb-[env(safe-area-inset-bottom)]">
         <div class="flex items-center gap-3 md:gap-5 text-[11px] md:text-xs text-[#a0a09e]">
             <a href="/about" class="hover:text-white transition-colors">About</a>
             <a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
@@ -669,7 +675,7 @@
 
         <!-- Footer (Fixed in the bottom) -->
         <footer
-            class="h-[56px] md:h-[65px] bg-[#3c3c3b] flex items-center justify-between px-4 md:px-10 shrink-0 w-full z-20">
+            class="min-h-[56px] md:h-[65px] bg-[#3c3c3b] flex items-center justify-between px-4 md:px-10 shrink-0 w-full z-20 pb-[env(safe-area-inset-bottom)]">
             <div class="flex items-center gap-3 md:gap-5 text-[11px] md:text-xs text-[#a0a09e]">
                 <a href="/about" class="hover:text-white transition-colors">About</a>
                 <a href="/privacy" class="hover:text-white transition-colors">Privacy</a>

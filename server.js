@@ -52,7 +52,15 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // 2. Static File Serving (Clean URLs support)
+    // 2. Clean URLs: redirect direct .html requests to clean paths (e.g. /about.html -> /about)
+    if (pathname.endsWith('.html') && pathname !== '/index.html') {
+        const cleanPath = pathname.slice(0, -5);
+        res.writeHead(301, { 'Location': cleanPath });
+        res.end();
+        return;
+    }
+
+    // Static File Serving (Clean URLs support)
     if (pathname === '/' || pathname === '') {
         pathname = '/index.html';
     } else if (!path.extname(pathname)) {
@@ -79,8 +87,13 @@ const server = http.createServer((req, res) => {
 
         const ext = path.extname(filePath).toLowerCase();
         const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+        const headers = { 'Content-Type': contentType };
 
-        res.writeHead(200, { 'Content-Type': contentType });
+        if (pathname.startsWith('/assets/')) {
+            headers['Cache-Control'] = 'public, max-age=31536000, immutable';
+        }
+
+        res.writeHead(200, headers);
         const stream = fs.createReadStream(filePath);
         stream.pipe(res);
     });
