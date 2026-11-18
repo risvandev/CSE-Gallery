@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Class Moments | gallery.mndo.online</title>
+    <title>CSE-B Class Moments</title>
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
     <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png">
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
@@ -22,7 +22,9 @@
         }
 
         @supports (height: 100dvh) {
-            :root { --app-h: 100dvh; }
+            :root {
+                --app-h: 100dvh;
+            }
         }
 
         /* Custom scrollbar to match the neat aesthetic if it ever scrolls */
@@ -217,30 +219,75 @@
         }
 
         @media (min-width: 768px) {
-            .site-footer { min-height: 65px; padding-left: 40px; padding-right: 40px; }
+            .site-footer {
+                min-height: 65px;
+                padding-left: 40px;
+                padding-right: 40px;
+            }
         }
 
         @media (max-width: 359px) {
-            .site-footer { padding-left: 12px; padding-right: 12px; }
-            .site-footer .footer-links { gap: 10px; }
-            .site-footer .footer-actions { gap: 6px; }
+            .site-footer {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            .site-footer .footer-links {
+                gap: 10px;
+            }
+
+            .site-footer .footer-actions {
+                gap: 6px;
+            }
+
             .site-footer .contact-btn,
-            .site-footer .report-btn { padding-left: 10px; padding-right: 10px; }
+            .site-footer .report-btn {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
         }
 
         /* ---- Landscape phones / very short screens: use the two-column layout ---- */
         @media (max-width: 1023px) and (orientation: landscape) and (max-height: 540px) {
-            .gallery-container { width: 50%; }
-            .hero-content { width: 50%; justify-content: flex-start; padding-left: 8%; }
-            .hero-content h1 { font-size: 22px; margin-bottom: 14px; }
-            #statsRow { margin-top: 14px; padding-top: 12px; }
-            :root { --card-w: 150px; }
-            .card-slot img { opacity: 0.35; }
+            .gallery-container {
+                width: 50%;
+            }
+
+            .hero-content {
+                width: 50%;
+                justify-content: flex-start;
+                padding-left: 8%;
+            }
+
+            .hero-content h1 {
+                font-size: 22px;
+                margin-bottom: 14px;
+            }
+
+            #statsRow {
+                margin-top: 14px;
+                padding-top: 12px;
+            }
+
+            :root {
+                --card-w: 150px;
+            }
+
+            .card-slot img {
+                opacity: 0.35;
+            }
         }
 
         /* ---- Gallery captions: hover on desktop, always visible on touch ---- */
-        .moment-overlay { opacity: 0; background: rgba(0, 0, 0, 0.5); transition: opacity 0.2s; }
-        .group:hover .moment-overlay { opacity: 1; }
+        .moment-overlay {
+            opacity: 0;
+            background: rgba(0, 0, 0, 0.5);
+            transition: opacity 0.2s;
+        }
+
+        .group:hover .moment-overlay {
+            opacity: 1;
+        }
 
         @media (hover: none) {
             .moment-overlay {
@@ -250,7 +297,9 @@
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .mobile-diagonal { animation: none; }
+            .mobile-diagonal {
+                animation: none;
+            }
         }
     </style>
 </head>
@@ -503,8 +552,7 @@
     </main>
 
     <!-- Footer -->
-    <footer
-        class="site-footer bg-[#3c3c3b] flex items-center justify-between shrink-0 w-full relative z-20">
+    <footer class="site-footer bg-[#3c3c3b] flex items-center justify-between shrink-0 w-full relative z-20">
         <div class="footer-links flex items-center gap-3 md:gap-5 text-[11px] md:text-xs text-[#a0a09e]">
             <a href="/about" class="hover:text-white transition-colors">About</a>
             <a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
@@ -678,8 +726,8 @@
                 Back
             </button>
             <div class="flex items-center gap-2 min-w-0">
-                <img src="/assets/logo-v2.png" alt="" aria-hidden="true" class="w-6 h-6 object-contain shrink-0 hidden min-[400px]:block"
-                    width="24" height="24">
+                <img src="/assets/logo-v2.png" alt="" aria-hidden="true"
+                    class="w-6 h-6 object-contain shrink-0 hidden min-[400px]:block" width="24" height="24">
                 <h1
                     class="text-xs sm:text-sm md:text-base lg:text-lg font-medium text-[#1a1a1a] whitespace-nowrap text-center px-1 truncate">
                     Class Moments</h1>
@@ -725,8 +773,7 @@
         </div>
 
         <!-- Footer (Fixed in the bottom) -->
-        <footer
-            class="site-footer bg-[#3c3c3b] flex items-center justify-between shrink-0 w-full relative z-20">
+        <footer class="site-footer bg-[#3c3c3b] flex items-center justify-between shrink-0 w-full relative z-20">
             <div class="footer-links flex items-center gap-3 md:gap-5 text-[11px] md:text-xs text-[#a0a09e]">
                 <a href="/about" class="hover:text-white transition-colors">About</a>
                 <a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
@@ -903,8 +950,33 @@
             await reloadMoments();
         }
 
-        // --- Moments Data Layer ---
-        async function fetchMoments() {
+        // --- Moments Data Layer with Session Cache & Stale-While-Revalidate ---
+        const MOMENTS_CACHE_KEY = 'cseb_gallery_moments_cache';
+        const MOMENTS_CACHE_TS_KEY = 'cseb_gallery_moments_ts';
+        const MOMENTS_CACHE_TTL_MS = 60 * 1000; // 60 seconds fresh window
+
+        async function fetchMoments(forceRefresh = false) {
+            // 1. Check local session cache first
+            let cached = null;
+            try {
+                const raw = sessionStorage.getItem(MOMENTS_CACHE_KEY);
+                const ts = parseInt(sessionStorage.getItem(MOMENTS_CACHE_TS_KEY) || '0', 10);
+                if (raw) {
+                    cached = {
+                        data: JSON.parse(raw),
+                        isFresh: (Date.now() - ts) < MOMENTS_CACHE_TTL_MS
+                    };
+                }
+            } catch (e) {
+                console.warn('Session cache read notice:', e);
+            }
+
+            // If fresh cache exists and refresh not explicitly forced, skip network call
+            if (cached && cached.isFresh && !forceRefresh) {
+                return cached.data;
+            }
+
+            // 2. Fetch fresh data from Supabase
             if (isSupabaseReady()) {
                 try {
                     const { data, error } = await supabaseClient
@@ -912,7 +984,7 @@
                         .select('*')
                         .order('created_at', { ascending: false });
                     if (error) throw error;
-                    return data.map(m => ({
+                    const moments = data.map(m => ({
                         id: m.id,
                         url: m.image_url,
                         name: m.title || 'Class Moment',
@@ -920,15 +992,30 @@
                         userId: m.user_id,
                         createdAt: m.created_at
                     }));
+
+                    // Save to session cache
+                    try {
+                        sessionStorage.setItem(MOMENTS_CACHE_KEY, JSON.stringify(moments));
+                        sessionStorage.setItem(MOMENTS_CACHE_TS_KEY, Date.now().toString());
+                    } catch (e) {
+                        console.warn('Session cache save notice:', e);
+                    }
+
+                    return moments;
                 } catch (err) {
-                    console.warn('Could not fetch moments from Supabase, using local fallback:', err);
+                    console.warn('Could not fetch moments from Supabase, using cache/local fallback:', err);
                 }
+            }
+
+            // Fallback to existing session cache (even if stale) before local demo storage
+            if (cached && cached.data && cached.data.length > 0) {
+                return cached.data;
             }
             return getStoredImages();
         }
 
-        async function reloadMoments() {
-            cachedMoments = await fetchMoments();
+        async function reloadMoments(forceRefresh = false) {
+            cachedMoments = await fetchMoments(forceRefresh);
             updateStats();
             updateMasonryCards();
             renderGallery();
@@ -1169,7 +1256,7 @@
                     saveLocalImage(currentImageDataUrl, caption);
                 }
 
-                await reloadMoments();
+                await reloadMoments(true);
                 closeModal();
                 showGallery();
             } catch (err) {
@@ -1213,7 +1300,7 @@
                 supabaseClient
                     .channel('public:moments')
                     .on('postgres_changes', { event: '*', schema: 'public', table: 'moments' }, () => {
-                        reloadMoments();
+                        reloadMoments(true);
                     })
                     .subscribe();
             } catch (err) {
@@ -1359,6 +1446,19 @@
 
         // --- Initial Startup & Auth Hydration ---
         async function initApp() {
+            // Instant render from session cache (0ms paint on back-navigation or refresh)
+            try {
+                const cachedRaw = sessionStorage.getItem(MOMENTS_CACHE_KEY);
+                if (cachedRaw) {
+                    cachedMoments = JSON.parse(cachedRaw);
+                    updateStats();
+                    updateMasonryCards();
+                    renderGallery();
+                }
+            } catch (e) {
+                // Ignore parse notice
+            }
+
             // Load environment configuration dynamically from /api/config (.env)
             appConfig = await fetchAppConfig();
 
@@ -1377,7 +1477,7 @@
                     supabaseClient.auth.onAuthStateChange(async (event, session) => {
                         currentUser = session?.user || null;
                         updateAuthUI();
-                        await reloadMoments();
+                        await reloadMoments(true);
                     });
 
                     setupRealtimeListener();
