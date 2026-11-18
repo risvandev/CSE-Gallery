@@ -71,8 +71,16 @@ const server = http.createServer((req, res) => {
 
     const filePath = path.join(__dirname, pathname);
 
+    // Only serve the site itself: never dotfiles (.env, .git), server code or package files
+    const BLOCKED = /(^|\/)\.|^\/(server\.js|package(-lock)?\.json|vercel\.json|supabase-schema\.sql|README\.md|node_modules|api)(\/|$)/i;
+    if (BLOCKED.test(pathname)) {
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('404 Not Found');
+        return;
+    }
+
     // Prevent directory traversal attacks
-    if (!filePath.startsWith(__dirname)) {
+    if (!filePath.startsWith(__dirname + path.sep)) {
         res.writeHead(403);
         res.end('Forbidden');
         return;
@@ -90,7 +98,7 @@ const server = http.createServer((req, res) => {
         const headers = { 'Content-Type': contentType };
 
         if (pathname.startsWith('/assets/')) {
-            headers['Cache-Control'] = 'public, max-age=31536000, immutable';
+            headers['Cache-Control'] = 'public, max-age=86400, stale-while-revalidate=604800';
         }
 
         res.writeHead(200, headers);

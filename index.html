@@ -3,11 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Moments | gallery.mndo.online</title>
-    <link rel="icon" type="image/png" href="/assets/favicon.png">
-    <link rel="apple-touch-icon" href="/assets/favicon.png">
-    <link rel="preload" as="image" href="/assets/logo_without_back.png" fetchpriority="high">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png">
+    <link rel="preload" as="image" href="/assets/logo-v2.png" fetchpriority="high">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -15,10 +16,13 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f2f1eb;
-            min-height: 100vh;
-            min-height: 100dvh;
-            height: 100vh;
-            height: 100dvh;
+            /* 100vh includes the area under the mobile URL bar, which hides the footer.
+               100dvh fixes it; --app-h is set by JS only where dvh is unsupported. */
+            height: var(--app-h, 100vh);
+        }
+
+        @supports (height: 100dvh) {
+            :root { --app-h: 100dvh; }
         }
 
         /* Custom scrollbar to match the neat aesthetic if it ever scrolls */
@@ -204,10 +208,54 @@
                 opacity: 0.35;
             }
         }
+
+        /* ---- Footer (shared by home + gallery view) ---- */
+        .site-footer {
+            min-height: 56px;
+            padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px));
+            gap: 8px;
+        }
+
+        @media (min-width: 768px) {
+            .site-footer { min-height: 65px; padding-left: 40px; padding-right: 40px; }
+        }
+
+        @media (max-width: 359px) {
+            .site-footer { padding-left: 12px; padding-right: 12px; }
+            .site-footer .footer-links { gap: 10px; }
+            .site-footer .footer-actions { gap: 6px; }
+            .site-footer .contact-btn,
+            .site-footer .report-btn { padding-left: 10px; padding-right: 10px; }
+        }
+
+        /* ---- Landscape phones / very short screens: use the two-column layout ---- */
+        @media (max-width: 1023px) and (orientation: landscape) and (max-height: 540px) {
+            .gallery-container { width: 50%; }
+            .hero-content { width: 50%; justify-content: flex-start; padding-left: 8%; }
+            .hero-content h1 { font-size: 22px; margin-bottom: 14px; }
+            #statsRow { margin-top: 14px; padding-top: 12px; }
+            :root { --card-w: 150px; }
+            .card-slot img { opacity: 0.35; }
+        }
+
+        /* ---- Gallery captions: hover on desktop, always visible on touch ---- */
+        .moment-overlay { opacity: 0; background: rgba(0, 0, 0, 0.5); transition: opacity 0.2s; }
+        .group:hover .moment-overlay { opacity: 1; }
+
+        @media (hover: none) {
+            .moment-overlay {
+                opacity: 1;
+                background: linear-gradient(to top, rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0) 55%);
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .mobile-diagonal { animation: none; }
+        }
     </style>
 </head>
 
-<body class="m-0 p-0 h-[100dvh] overflow-hidden flex flex-col text-[#1a1a1a]">
+<body class="m-0 p-0 overflow-hidden flex flex-col text-[#1a1a1a]">
 
     <!-- Main Content Area -->
     <main class="relative flex-1 min-h-0 w-full overflow-hidden flex">
@@ -217,8 +265,8 @@
 
             <!-- Logo -->
             <div class="absolute top-6 left-6 md:top-[40px] md:left-[40px] flex items-center z-30">
-                <img src="/assets/logo_without_back.png" alt="Class Moments Logo"
-                    class="w-8 h-8 md:w-10 md:h-10 object-contain select-none" width="40" height="40"
+                <img src="/assets/logo-v2.png" alt="Class Moments Logo"
+                    class="w-9 h-9 md:w-11 md:h-11 object-contain select-none" width="44" height="44"
                     fetchpriority="high" loading="eager">
             </div>
 
@@ -287,7 +335,7 @@
 
                 <!-- Dynamic Class Stats Row -->
                 <div id="statsRow"
-                    class="mt-8 pt-5 border-t border-[#deddd7]/80 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#7a7a7a]">
+                    class="mt-8 pt-5 border-t border-[#deddd7]/80 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-[#5c5c5a]">
                     <div class="flex items-center gap-1.5">
                         <span>Total moments: <strong id="totalCount"
                                 class="text-[#1a1a1a] font-medium">0</strong></span>
@@ -456,13 +504,13 @@
 
     <!-- Footer -->
     <footer
-        class="min-h-[56px] md:h-[65px] bg-[#3c3c3b] flex items-center justify-between px-4 md:px-10 shrink-0 w-full relative z-20 pb-[env(safe-area-inset-bottom)]">
-        <div class="flex items-center gap-3 md:gap-5 text-[11px] md:text-xs text-[#a0a09e]">
+        class="site-footer bg-[#3c3c3b] flex items-center justify-between shrink-0 w-full relative z-20">
+        <div class="footer-links flex items-center gap-3 md:gap-5 text-[11px] md:text-xs text-[#a0a09e]">
             <a href="/about" class="hover:text-white transition-colors">About</a>
             <a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
             <a href="/terms" class="hover:text-white transition-colors">Terms</a>
         </div>
-        <div class="flex items-center gap-2.5 md:gap-4">
+        <div class="footer-actions flex items-center gap-2.5 md:gap-4">
             <button
                 class="contact-btn bg-transparent text-white border border-[#7a7a7a] px-3.5 py-1.5 md:px-6 md:py-2 rounded-md text-xs md:text-[13px] font-medium hover:bg-[#555] transition-colors cursor-pointer tracking-wide">
                 Contact
@@ -478,7 +526,7 @@
     <div id="uploadModal"
         class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div
-            class="bg-[#f2f1eb] border border-[#deddd7] rounded-2xl p-6 md:p-8 max-w-md w-full shadow-xl relative text-[#1a1a1a]">
+            class="bg-[#f2f1eb] border border-[#deddd7] rounded-2xl max-h-[90dvh] overflow-y-auto p-6 md:p-8 max-w-md w-full shadow-xl relative text-[#1a1a1a]">
             <!-- Close Button -->
             <button id="closeUploadModal"
                 class="absolute top-4 right-4 text-[#7a7a7a] hover:text-[#1a1a1a] p-1.5 rounded-lg transition-colors cursor-pointer"
@@ -546,7 +594,7 @@
     <div id="whatsappModal"
         class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div
-            class="bg-[#f2f1eb] border border-[#deddd7] rounded-2xl p-6 max-w-sm w-full shadow-xl relative text-[#1a1a1a]">
+            class="bg-[#f2f1eb] border border-[#deddd7] rounded-2xl max-h-[90dvh] overflow-y-auto p-6 max-w-sm w-full shadow-xl relative text-[#1a1a1a]">
             <!-- Cross in the top right -->
             <button id="closeWhatsappModal"
                 class="absolute top-4 right-4 text-[#7a7a7a] hover:text-[#1a1a1a] p-1.5 rounded-lg transition-colors cursor-pointer"
@@ -580,7 +628,7 @@
     <div id="authPromptModal"
         class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div
-            class="bg-[#f2f1eb] border border-[#deddd7] rounded-2xl p-6 md:p-8 max-w-sm w-full shadow-xl relative text-[#1a1a1a]">
+            class="bg-[#f2f1eb] border border-[#deddd7] rounded-2xl max-h-[90dvh] overflow-y-auto p-6 md:p-8 max-w-sm w-full shadow-xl relative text-[#1a1a1a]">
             <button id="closeAuthPromptModal"
                 class="absolute top-4 right-4 text-[#7a7a7a] hover:text-[#1a1a1a] p-1.5 rounded-lg transition-colors cursor-pointer"
                 aria-label="Close">
@@ -629,7 +677,9 @@
                 </svg>
                 Back
             </button>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+                <img src="/assets/logo-v2.png" alt="" aria-hidden="true" class="w-6 h-6 object-contain shrink-0 hidden min-[400px]:block"
+                    width="24" height="24">
                 <h1
                     class="text-xs sm:text-sm md:text-base lg:text-lg font-medium text-[#1a1a1a] whitespace-nowrap text-center px-1 truncate">
                     Class Moments</h1>
@@ -676,13 +726,13 @@
 
         <!-- Footer (Fixed in the bottom) -->
         <footer
-            class="min-h-[56px] md:h-[65px] bg-[#3c3c3b] flex items-center justify-between px-4 md:px-10 shrink-0 w-full z-20 pb-[env(safe-area-inset-bottom)]">
-            <div class="flex items-center gap-3 md:gap-5 text-[11px] md:text-xs text-[#a0a09e]">
+            class="site-footer bg-[#3c3c3b] flex items-center justify-between shrink-0 w-full relative z-20">
+            <div class="footer-links flex items-center gap-3 md:gap-5 text-[11px] md:text-xs text-[#a0a09e]">
                 <a href="/about" class="hover:text-white transition-colors">About</a>
                 <a href="/privacy" class="hover:text-white transition-colors">Privacy</a>
                 <a href="/terms" class="hover:text-white transition-colors">Terms</a>
             </div>
-            <div class="flex items-center gap-2.5 md:gap-4">
+            <div class="footer-actions flex items-center gap-2.5 md:gap-4">
                 <button
                     class="contact-btn bg-transparent text-white border border-[#7a7a7a] px-3.5 py-1.5 md:px-6 md:py-2 rounded-md text-xs md:text-[13px] font-medium hover:bg-[#555] transition-colors cursor-pointer tracking-wide">
                     Contact
@@ -696,6 +746,15 @@
     </section>
 
     <script>
+        // --- Viewport height fallback for browsers without dvh support ---
+        (function () {
+            if (window.CSS && CSS.supports && CSS.supports('height', '100dvh')) return;
+            const setH = () => document.documentElement.style.setProperty('--app-h', window.innerHeight + 'px');
+            setH();
+            window.addEventListener('resize', setH);
+            window.addEventListener('orientationchange', () => setTimeout(setH, 250));
+        })();
+
         // --- Environment Configuration & Supabase Initialization ---
         let appConfig = null;
         let supabaseClient = null;
@@ -904,13 +963,20 @@
                 const set1Slots = track.querySelectorAll('.set-1 .card-slot');
                 const set2Slots = track.querySelectorAll('.set-2 .card-slot');
 
+                const fill = (slot, m) => {
+                    slot.textContent = '';
+                    const im = document.createElement('img');
+                    im.src = m.url;              // DOM, never innerHTML: captions/URLs can contain HTML
+                    im.alt = m.name || '';
+                    im.className = 'w-full h-full object-cover opacity-20 md:opacity-35';
+                    im.decoding = 'async';
+                    slot.appendChild(im);
+                };
+
                 set1Slots.forEach((slot, cardIdx) => {
-                    const img = cachedMoments[(colIdx * 2 + cardIdx) % cachedMoments.length];
-                    const content = `<img src="${img.url}" alt="${img.name}" class="w-full h-full object-cover opacity-20 md:opacity-35">`;
-                    slot.innerHTML = content;
-                    if (set2Slots[cardIdx]) {
-                        set2Slots[cardIdx].innerHTML = content;
-                    }
+                    const m = cachedMoments[(colIdx * 2 + cardIdx) % cachedMoments.length];
+                    fill(slot, m);
+                    if (set2Slots[cardIdx]) fill(set2Slots[cardIdx], m);
                 });
             });
         }
@@ -938,7 +1004,7 @@
                 imageEl.className = 'w-full h-auto block transition-transform duration-300 group-hover:scale-[1.02]';
 
                 const overlay = document.createElement('div');
-                overlay.className = 'absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-2.5 sm:p-3';
+                overlay.className = 'moment-overlay absolute inset-0 flex flex-col justify-end p-2.5 sm:p-3';
 
                 const title = document.createElement('p');
                 title.className = 'text-white text-xs font-medium truncate drop-shadow';
