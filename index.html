@@ -11,6 +11,7 @@
     <link rel="preload" as="image" href="/assets/logo-v2.png" fetchpriority="high">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body {
@@ -142,6 +143,7 @@
             position: relative;
             width: var(--card-w) !important;
             flex-shrink: 0;
+            background-color: transparent !important;
             transition: width 0.6s cubic-bezier(0.25, 1, 0.5, 1), height 0.6s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
@@ -408,43 +410,43 @@
                         <!-- Set 1 -->
                         <div class="set-1 flex flex-col gap-6 pb-6">
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
                             </div>
                         </div>
                         <!-- Set 2 (Duplicate for seamless loop) -->
                         <div class="set-2 flex flex-col gap-6 pb-6">
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
                             </div>
                         </div>
                     </div>
@@ -456,43 +458,43 @@
                         <!-- Set 1 -->
                         <div class="set-1 flex flex-col gap-6 pb-6">
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[260px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[260px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[260px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[260px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
                             </div>
                         </div>
                         <!-- Set 2 -->
                         <div class="set-2 flex flex-col gap-6 pb-6">
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[260px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[260px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[260px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[260px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
                             </div>
                         </div>
                     </div>
@@ -504,43 +506,43 @@
                         <!-- Set 1 -->
                         <div class="set-1 flex flex-col gap-6 pb-6">
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
                             </div>
                         </div>
                         <!-- Set 2 -->
                         <div class="set-2 flex flex-col gap-6 pb-6">
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[240px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[280px] shrink-0 bg-cover bg-center">
                             </div>
                             <div
-                                class="card-slot bg-[#deddd7] rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
+                                class="card-slot bg-transparent rounded-xl w-[210px] h-[220px] shrink-0 bg-cover bg-center">
                             </div>
                         </div>
                     </div>
@@ -593,6 +595,7 @@
             <div id="dropZone"
                 class="border-2 border-dashed border-[#deddd7] hover:border-[#1a1a1a] rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-colors bg-white/40">
                 <input type="file" id="imageInput" accept="image/*" class="hidden">
+                <p id="compressStatus" class="hidden text-xs text-[#7a7a7a] mt-2">Compressing…</p>
 
                 <div id="uploadPrompt" class="flex flex-col items-center">
                     <div class="w-12 h-12 rounded-full bg-[#deddd7]/60 flex items-center justify-center mb-3">
@@ -619,6 +622,7 @@
                     <img id="previewImg" src="" alt="Selected image preview"
                         class="max-h-40 rounded-lg object-contain mb-3 border border-[#deddd7]">
                     <p id="fileName" class="text-xs font-medium text-[#1a1a1a] truncate max-w-full mb-2"></p>
+                    <p id="sizeInfo" class="text-[11px] text-[#7a7a7a] mb-2"></p>
                     <input id="momentCaption" type="text" maxlength="80"
                         placeholder="Add a memory title or note (optional)"
                         class="w-full bg-white border border-[#deddd7] focus:border-[#1a1a1a] rounded-lg px-3 py-2 text-xs text-[#1a1a1a] outline-none mb-2.5 transition-colors placeholder:text-[#a0a09e]">
@@ -1148,6 +1152,10 @@
             filePreview.classList.add('hidden');
             previewImg.src = '';
             fileName.textContent = '';
+            const sizeInfo = document.getElementById('sizeInfo');
+            if (sizeInfo) sizeInfo.textContent = '';
+            const compressStatus = document.getElementById('compressStatus');
+            if (compressStatus) compressStatus.classList.add('hidden');
             uploadError.classList.add('hidden');
             uploadError.textContent = '';
             dropZone.classList.remove('border-[#1a1a1a]', 'bg-white/70');
@@ -1155,7 +1163,57 @@
             if (doneBtnText) doneBtnText.textContent = 'Upload Moment';
         }
 
-        function handleFile(file) {
+        const COMPRESS_OPTIONS = {
+            maxSizeMB: 0.4,            // target ~400 KB
+            maxWidthOrHeight: 1600,    // longest side in pixels
+            useWebWorker: true,        // keeps the page responsive
+            fileType: 'image/jpeg',
+            initialQuality: 0.8,
+            preserveExif: false        // also strips GPS location from photos
+        };
+
+        async function handleFile(file) {
+            uploadError.classList.add('hidden');
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                uploadError.textContent = 'Only image files are allowed.';
+                uploadError.classList.remove('hidden');
+                resetUpload();
+                return;
+            }
+
+            // If the library failed to load (blocked CDN, offline), use the old canvas method
+            if (typeof imageCompression === 'undefined') {
+                return handleFileFallback(file);
+            }
+
+            const status = document.getElementById('compressStatus');
+            const sizeInfo = document.getElementById('sizeInfo');
+            status.classList.remove('hidden');
+
+            try {
+                const compressed = await imageCompression(file, COMPRESS_OPTIONS);
+
+                currentImageBlob = compressed;
+                currentImageDataUrl = await imageCompression.getDataUrlFromFile(compressed);
+
+                previewImg.src = currentImageDataUrl;
+                fileName.textContent = file.name;
+                sizeInfo.textContent =
+                    `${(file.size / 1024 / 1024).toFixed(1)} MB → ${Math.round(compressed.size / 1024)} KB`;
+
+                uploadPrompt.classList.add('hidden');
+                filePreview.classList.remove('hidden');
+            } catch (err) {
+                console.warn('Compression failed, using fallback:', err);
+                handleFileFallback(file);
+            } finally {
+                status.classList.add('hidden');
+            }
+        }
+
+        function handleFileFallback(file) {
             uploadError.classList.add('hidden');
             if (!file) return;
             if (!file.type.startsWith('image/')) {
