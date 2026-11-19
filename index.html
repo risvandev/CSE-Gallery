@@ -617,11 +617,8 @@
                 <div id="filePreview" class="hidden flex flex-col items-center w-full">
                     <img id="previewImg" src="" alt="Selected image preview"
                         class="max-h-40 rounded-lg object-contain mb-3 border border-[#deddd7]">
-                    <p id="fileName" class="text-xs font-medium text-[#1a1a1a] truncate max-w-full mb-2"></p>
-                    <p id="sizeInfo" class="text-[11px] text-[#7a7a7a] mb-2"></p>
-                    <input id="momentCaption" type="text" maxlength="80"
-                        placeholder="Add a memory title or note (optional)"
-                        class="w-full bg-white border border-[#deddd7] focus:border-[#1a1a1a] rounded-lg px-3 py-2 text-xs text-[#1a1a1a] outline-none mb-2.5 transition-colors placeholder:text-[#a0a09e]">
+                    <p id="fileName" class="text-xs font-medium text-[#1a1a1a] truncate max-w-full mb-1"></p>
+                    <p id="sizeInfo" class="text-[11px] text-[#7a7a7a] mb-3"></p>
                     <div id="uploaderBadge"
                         class="w-full flex items-center justify-between text-[11px] text-[#7a7a7a] mb-3 px-0.5">
                         <span>Uploading as: <strong id="uploaderName" class="text-[#1a1a1a]">Classmate</strong></span>
@@ -1550,7 +1547,7 @@
         async function submitUpload() {
             if (!currentImageBlob && !currentImageDataUrl) return;
 
-            const caption = (momentCaption && momentCaption.value.trim()) || fileName.textContent || 'Class Moment';
+            const caption = (momentCaption && momentCaption.value.trim()) || 'Class Moment';
 
             doneBtn.disabled = true;
             if (doneBtnText) doneBtnText.innerHTML = `
