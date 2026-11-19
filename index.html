@@ -1195,6 +1195,22 @@
             });
         }
 
+        function getStoragePath(moment) {
+            let path = moment.filePath;
+            if (!path && moment.url) {
+                const bucket = appConfig?.storageBucket || 'class-moments';
+                const marker = `/${bucket}/`;
+                const idx = moment.url.indexOf(marker);
+                if (idx !== -1) {
+                    path = moment.url.substring(idx + marker.length).split('?')[0];
+                }
+            }
+            if (path) {
+                path = decodeURIComponent(path).replace(/^\/+/, '');
+            }
+            return path;
+        }
+
         async function deleteMoment(moment, btn) {
             const confirmed = await confirmDeleteMoment();
             if (!confirmed) return;
@@ -1220,13 +1236,23 @@
 
             try {
                 if (isSupabaseReady() && currentUser) {
-                    // 1. Remove file from storage bucket if path available
-                    if (moment.filePath) {
+                    // 1. Remove file from storage bucket (checks filePath or extracts from image_url)
+                    const pathToDelete = getStoragePath(moment);
+                    if (pathToDelete) {
                         const bucket = appConfig?.storageBucket || 'class-moments';
-                        await supabaseClient.storage.from(bucket).remove([moment.filePath]);
+                        const { data: storageData, error: storageError } = await supabaseClient
+                            .storage
+                            .from(bucket)
+                            .remove([pathToDelete]);
+
+                        if (storageError) {
+                            console.warn('Direct storage removal notice:', storageError);
+                        } else {
+                            console.log('Storage file removed successfully:', storageData);
+                        }
                     }
 
-                    // 2. Remove record from moments database table
+                    // 2. Remove record from moments database table (triggers server storage cleanup as well)
                     const { error } = await supabaseClient
                         .from('moments')
                         .delete()
