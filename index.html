@@ -243,7 +243,6 @@
                 gap: 6px;
             }
 
-            .site-footer .contact-btn,
             .site-footer .report-btn {
                 padding-left: 10px;
                 padding-right: 10px;
@@ -563,10 +562,6 @@
         </div>
         <div class="footer-actions flex items-center gap-2.5 md:gap-4">
             <button
-                class="contact-btn bg-transparent text-white border border-[#7a7a7a] px-3.5 py-1.5 md:px-6 md:py-2 rounded-md text-xs md:text-[13px] font-medium hover:bg-[#555] transition-colors cursor-pointer tracking-wide">
-                Contact
-            </button>
-            <button
                 class="report-btn bg-transparent text-white border border-[#7a7a7a] px-3.5 py-1.5 md:px-6 md:py-2 rounded-md text-xs md:text-[13px] font-medium hover:bg-[#555] transition-colors cursor-pointer tracking-wide">
                 Report
             </button>
@@ -664,10 +659,10 @@
                 You will be redirected to WhatsApp. Please don't change the template—just add your message to it.
             </p>
 
-            <!-- Report or Contact Button -->
+            <!-- Report / Contact Button -->
             <button id="confirmWhatsappBtn"
                 class="bg-[#1a1a1a] text-white hover:bg-black transition-colors px-5 py-2.5 rounded-lg text-sm font-medium w-full flex items-center justify-center gap-2 cursor-pointer">
-                <span id="confirmWhatsappText">Contact</span>
+                <span id="confirmWhatsappText">Report / Contact</span>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
                     <path d="M7 17L17 7"></path>
@@ -848,10 +843,6 @@
             </div>
             <div class="footer-actions flex items-center gap-2.5 md:gap-4">
                 <button
-                    class="contact-btn bg-transparent text-white border border-[#7a7a7a] px-3.5 py-1.5 md:px-6 md:py-2 rounded-md text-xs md:text-[13px] font-medium hover:bg-[#555] transition-colors cursor-pointer tracking-wide">
-                    Contact
-                </button>
-                <button
                     class="report-btn bg-transparent text-white border border-[#7a7a7a] px-3.5 py-1.5 md:px-6 md:py-2 rounded-md text-xs md:text-[13px] font-medium hover:bg-[#555] transition-colors cursor-pointer tracking-wide">
                     Report
                 </button>
@@ -947,7 +938,7 @@
         const lightboxTitle = document.getElementById('lightboxTitle');
         const lightboxAuthor = document.getElementById('lightboxAuthor');
 
-        let currentWhatsappType = 'Contact';
+        let currentWhatsappType = 'Report / Contact';
         const WHATSAPP_PHONE = '918848460715';
         let currentImageDataUrl = null;
         let currentImageBlob = null;
@@ -1606,15 +1597,15 @@
 
         // --- WhatsApp Template & Modal ---
         function getWhatsappTemplate(type) {
-            return `*Gallery.MNDO ${type}*:
+            return `*Gallery.MNDO ${type || 'Report / Contact'}*:
 *Name:* ${currentUser ? (currentUser.user_metadata?.full_name || '') : ''}
 *Subject:* 
 *Message:* `;
         }
 
-        function openWhatsappModal(type) {
+        function openWhatsappModal(type = 'Report / Contact') {
             currentWhatsappType = type;
-            confirmWhatsappText.textContent = type;
+            if (confirmWhatsappText) confirmWhatsappText.textContent = type;
             whatsappModal.classList.remove('hidden');
         }
 
@@ -1666,12 +1657,8 @@
             if (e.target === authPromptModal) authPromptModal.classList.add('hidden');
         });
 
-        document.querySelectorAll('.contact-btn').forEach(btn => {
-            btn.addEventListener('click', () => openWhatsappModal('Contact'));
-        });
-
         document.querySelectorAll('.report-btn').forEach(btn => {
-            btn.addEventListener('click', () => openWhatsappModal('Report'));
+            btn.addEventListener('click', () => openWhatsappModal('Report / Contact'));
         });
 
         closeWhatsappModal.addEventListener('click', closeWhatsappModalFn);
