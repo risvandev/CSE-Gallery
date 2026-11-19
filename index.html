@@ -1163,15 +1163,6 @@
             if (doneBtnText) doneBtnText.textContent = 'Upload Moment';
         }
 
-        const COMPRESS_OPTIONS = {
-            maxSizeMB: 0.4,            // target ~400 KB
-            maxWidthOrHeight: 1600,    // longest side in pixels
-            useWebWorker: true,        // keeps the page responsive
-            fileType: 'image/jpeg',
-            initialQuality: 0.8,
-            preserveExif: false        // also strips GPS location from photos
-        };
-
         async function handleFile(file) {
             uploadError.classList.add('hidden');
             if (!file) return;
@@ -1193,7 +1184,18 @@
             status.classList.remove('hidden');
 
             try {
-                const compressed = await imageCompression(file, COMPRESS_OPTIONS);
+                // Preserve PNG/WebP so transparent backgrounds don't turn black
+                const isTransparent = file.type === 'image/png' || file.type === 'image/webp';
+                const options = {
+                    maxSizeMB: 0.5,
+                    maxWidthOrHeight: 1600,
+                    useWebWorker: true,
+                    fileType: isTransparent ? file.type : 'image/jpeg',
+                    initialQuality: 0.85,
+                    preserveExif: false
+                };
+
+                const compressed = await imageCompression(file, options);
 
                 currentImageBlob = compressed;
                 currentImageDataUrl = await imageCompression.getDataUrlFromFile(compressed);
@@ -1236,13 +1238,17 @@
                     canvas.width = width;
                     canvas.height = height;
                     canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-                    currentImageDataUrl = canvas.toDataURL('image/jpeg', 0.88);
+
+                    const isTransparent = file.type === 'image/png' || file.type === 'image/webp';
+                    const mimeType = isTransparent ? file.type : 'image/jpeg';
+
+                    currentImageDataUrl = canvas.toDataURL(mimeType, 0.88);
                     previewImg.src = currentImageDataUrl;
                     fileName.textContent = file.name;
 
                     canvas.toBlob((blob) => {
                         currentImageBlob = blob;
-                    }, 'image/jpeg', 0.88);
+                    }, mimeType, 0.88);
 
                     uploadPrompt.classList.add('hidden');
                     filePreview.classList.remove('hidden');
@@ -1272,15 +1278,16 @@
             try {
                 if (isSupabaseReady() && currentUser) {
                     const bucket = appConfig?.storageBucket || 'class-moments';
-                    const fileExt = 'jpg';
+                    const mimeType = currentImageBlob?.type || 'image/jpeg';
+                    const fileExt = mimeType === 'image/png' ? 'png' : (mimeType === 'image/webp' ? 'webp' : 'jpg');
                     const cleanName = (fileName.textContent || 'moment').replace(/[^a-zA-Z0-9]/g, '_');
                     const filePath = `${currentUser.id}/${Date.now()}_${cleanName}.${fileExt}`;
 
-                    // 1. Upload to Supabase Storage Bucket
+                    // 1. Upload to Supabase Storage Bucket with correct contentType
                     const { error: storageError } = await supabaseClient.storage
                         .from(bucket)
                         .upload(filePath, currentImageBlob, {
-                            contentType: 'image/jpeg',
+                            contentType: mimeType,
                             cacheControl: '3600',
                             upsert: false
                         });
