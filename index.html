@@ -716,6 +716,59 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal (Theme-Oriented Minimal Pop-up) -->
+    <div id="deleteConfirmModal"
+        class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div
+            class="bg-[#f2f1eb] border border-[#deddd7] rounded-2xl p-6 md:p-7 max-w-sm w-full shadow-xl relative text-[#1a1a1a]">
+            <!-- Close cross button -->
+            <button id="closeDeleteModal"
+                class="absolute top-4 right-4 text-[#7a7a7a] hover:text-[#1a1a1a] p-1.5 rounded-lg transition-colors cursor-pointer"
+                aria-label="Close">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+
+            <!-- Trash Icon Badge -->
+            <div
+                class="w-11 h-11 rounded-full bg-red-100/70 border border-red-200 flex items-center justify-center mb-3.5 text-red-600">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+            </div>
+
+            <!-- Content -->
+            <h3 class="text-base font-semibold text-[#1a1a1a] mb-1.5">Delete Moment</h3>
+            <p class="text-xs md:text-sm text-[#5c5c5a] leading-relaxed mb-6">
+                Are you sure you want to delete this photo from the gallery?
+            </p>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-2.5">
+                <button id="cancelDeleteBtn"
+                    class="flex-1 bg-white/60 hover:bg-white border border-[#deddd7] hover:border-[#1a1a1a] text-[#1a1a1a] px-4 py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors cursor-pointer text-center">
+                    Cancel
+                </button>
+                <button id="confirmDeleteBtn"
+                    class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg text-xs md:text-sm font-medium transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm text-center">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                    <span>Delete</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Gallery Page -->
     <section id="galleryView" class="fixed inset-0 z-40 bg-[#f2f1eb] flex flex-col hidden text-[#1a1a1a]">
         <!-- Top Navigation Bar -->
@@ -1103,8 +1156,49 @@
             }, 1000);
         }
 
+        function confirmDeleteMoment() {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('deleteConfirmModal');
+                const confirmBtn = document.getElementById('confirmDeleteBtn');
+                const cancelBtn = document.getElementById('cancelDeleteBtn');
+                const closeBtn = document.getElementById('closeDeleteModal');
+
+                function cleanup(confirmed) {
+                    modal.classList.add('hidden');
+                    confirmBtn.removeEventListener('click', onConfirm);
+                    cancelBtn.removeEventListener('click', onCancel);
+                    closeBtn.removeEventListener('click', onCancel);
+                    modal.removeEventListener('click', onBackdrop);
+                    window.removeEventListener('keydown', onKey);
+                    resolve(confirmed);
+                }
+
+                function onConfirm() { cleanup(true); }
+                function onCancel() { cleanup(false); }
+                function onBackdrop(e) { if (e.target === modal) cleanup(false); }
+                function onKey(e) { if (e.key === 'Escape') cleanup(false); }
+
+                confirmBtn.addEventListener('click', onConfirm);
+                cancelBtn.addEventListener('click', onCancel);
+                closeBtn.addEventListener('click', onCancel);
+                modal.addEventListener('click', onBackdrop);
+                window.addEventListener('keydown', onKey);
+
+                modal.classList.remove('hidden');
+            });
+        }
+
         async function deleteMoment(moment, btn) {
-            if (!confirm('Are you sure you want to delete this photo from the gallery?')) return;
+            const confirmed = await confirmDeleteMoment();
+            if (!confirmed) return;
+
+            // Check if 1-minute window expired while the modal was open
+            const createdTime = moment.createdAt ? new Date(moment.createdAt).getTime() : 0;
+            if (Date.now() - createdTime > 60000) {
+                alert('The 1-minute window has expired. This photo can no longer be deleted.');
+                await reloadMoments(true);
+                return;
+            }
 
             if (btn) {
                 btn.disabled = true;
@@ -1533,6 +1627,8 @@
 
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
+                const deleteModal = document.getElementById('deleteConfirmModal');
+                if (deleteModal && !deleteModal.classList.contains('hidden')) return;
                 if (!uploadModal.classList.contains('hidden')) closeModal();
                 else if (!whatsappModal.classList.contains('hidden')) closeWhatsappModalFn();
                 else if (authPromptModal && !authPromptModal.classList.contains('hidden')) authPromptModal.classList.add('hidden');
