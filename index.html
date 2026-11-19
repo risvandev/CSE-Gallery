@@ -751,6 +751,33 @@
         </div>
     </div>
 
+    <!-- Image Zoom Lightbox Modal (Blurred Backdrop & Zoom Animation) -->
+    <div id="imageLightboxModal"
+        class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/80 backdrop-blur-md opacity-0 pointer-events-none transition-opacity duration-300 ease-out cursor-zoom-out"
+        aria-hidden="true">
+        <!-- Close button in top-right -->
+        <button id="closeLightboxBtn"
+            class="absolute top-4 right-4 sm:top-6 sm:right-6 text-white/80 hover:text-white bg-black/40 hover:bg-black/60 p-2 rounded-full backdrop-blur-sm transition-colors cursor-pointer z-10"
+            aria-label="Close zoomed view">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+
+        <!-- Centered Zoom Container -->
+        <div id="lightboxContent"
+            class="flex flex-col items-center max-w-[95vw] max-h-[92vh] transform scale-75 opacity-0 transition-all duration-300 ease-out select-none">
+            <img id="lightboxImg" src="" alt="Zoomed moment"
+                class="max-w-[92vw] max-h-[80vh] md:max-h-[84vh] object-contain rounded-lg shadow-2xl transition-all cursor-zoom-out" />
+            <div id="lightboxMeta" class="mt-3 text-center px-4 max-w-lg cursor-default">
+                <p id="lightboxTitle" class="text-white text-xs sm:text-sm md:text-base font-medium drop-shadow truncate"></p>
+                <p id="lightboxAuthor" class="text-[#deddd7] text-[11px] sm:text-xs drop-shadow truncate mt-0.5"></p>
+            </div>
+        </div>
+    </div>
+
     <!-- Gallery Page -->
     <section id="galleryView" class="fixed inset-0 z-40 bg-[#f2f1eb] flex flex-col hidden text-[#1a1a1a]">
         <!-- Top Navigation Bar -->
@@ -912,6 +939,13 @@
         const closeWhatsappModal = document.getElementById('closeWhatsappModal');
         const confirmWhatsappBtn = document.getElementById('confirmWhatsappBtn');
         const confirmWhatsappText = document.getElementById('confirmWhatsappText');
+
+        const imageLightboxModal = document.getElementById('imageLightboxModal');
+        const closeLightboxBtn = document.getElementById('closeLightboxBtn');
+        const lightboxContent = document.getElementById('lightboxContent');
+        const lightboxImg = document.getElementById('lightboxImg');
+        const lightboxTitle = document.getElementById('lightboxTitle');
+        const lightboxAuthor = document.getElementById('lightboxAuthor');
 
         let currentWhatsappType = 'Contact';
         const WHATSAPP_PHONE = '918848460715';
@@ -1222,6 +1256,49 @@
             }
         }
 
+        // --- Image Zoom Lightbox Preview ---
+        function openLightbox(moment) {
+            if (!moment || !moment.url) return;
+            lightboxImg.src = moment.url;
+            lightboxImg.alt = moment.name || 'Moment';
+
+            if (moment.name) {
+                lightboxTitle.textContent = moment.name;
+                lightboxTitle.classList.remove('hidden');
+            } else {
+                lightboxTitle.classList.add('hidden');
+            }
+
+            if (moment.userName) {
+                lightboxAuthor.textContent = `by ${moment.userName}`;
+                lightboxAuthor.classList.remove('hidden');
+            } else {
+                lightboxAuthor.classList.add('hidden');
+            }
+
+            // Reset initial zoom animation state
+            lightboxContent.classList.remove('scale-100', 'opacity-100');
+            lightboxContent.classList.add('scale-75', 'opacity-0');
+
+            // Show blurred backdrop
+            imageLightboxModal.classList.remove('pointer-events-none', 'opacity-0');
+            imageLightboxModal.classList.add('pointer-events-auto', 'opacity-100');
+
+            // Smoothly zoom forward towards user
+            setTimeout(() => {
+                lightboxContent.classList.remove('scale-75', 'opacity-0');
+                lightboxContent.classList.add('scale-100', 'opacity-100');
+            }, 20);
+        }
+
+        function closeLightbox() {
+            if (!imageLightboxModal || imageLightboxModal.classList.contains('opacity-0')) return;
+            lightboxContent.classList.remove('scale-100', 'opacity-100');
+            lightboxContent.classList.add('scale-75', 'opacity-0');
+            imageLightboxModal.classList.remove('opacity-100', 'pointer-events-auto');
+            imageLightboxModal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
         function renderGallery() {
             galleryGrid.innerHTML = '';
             if (cachedMoments.length === 0) {
@@ -1241,8 +1318,13 @@
 
             cachedMoments.forEach((img) => {
                 const card = document.createElement('div');
-                card.className = 'break-inside-avoid mb-0 relative group overflow-hidden border-[0.5px] border-[#1a1a1a]';
+                card.className = 'break-inside-avoid mb-0 relative group overflow-hidden border-[0.5px] border-[#1a1a1a] cursor-pointer';
                 card.style.border = '0.5px solid #1a1a1a';
+
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.moment-delete-btn')) return;
+                    openLightbox(img);
+                });
 
                 const imageEl = document.createElement('img');
                 imageEl.src = img.url;
@@ -1309,6 +1391,7 @@
         }
 
         function hideGallery() {
+            closeLightbox();
             galleryView.classList.add('hidden');
         }
 
@@ -1607,10 +1690,31 @@
             if (e.target === uploadModal) closeModal();
         });
 
+        if (closeLightboxBtn) {
+            closeLightboxBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeLightbox();
+            });
+        }
+
+        if (imageLightboxModal) {
+            imageLightboxModal.addEventListener('click', (e) => {
+                if (!e.target.closest('#lightboxMeta')) {
+                    closeLightbox();
+                }
+            });
+        }
+
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 const deleteModal = document.getElementById('deleteConfirmModal');
                 if (deleteModal && !deleteModal.classList.contains('hidden')) return;
+
+                if (imageLightboxModal && !imageLightboxModal.classList.contains('opacity-0') && !imageLightboxModal.classList.contains('pointer-events-none')) {
+                    closeLightbox();
+                    return;
+                }
+
                 if (!uploadModal.classList.contains('hidden')) closeModal();
                 else if (!whatsappModal.classList.contains('hidden')) closeWhatsappModalFn();
                 else if (authPromptModal && !authPromptModal.classList.contains('hidden')) authPromptModal.classList.add('hidden');
