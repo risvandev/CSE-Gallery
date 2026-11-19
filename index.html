@@ -1252,7 +1252,7 @@
                         }
                     }
 
-                    // 2. Remove record from moments database table (triggers server storage cleanup as well)
+                    // 2. Remove record from moments database table
                     const { error } = await supabaseClient
                         .from('moments')
                         .delete()
